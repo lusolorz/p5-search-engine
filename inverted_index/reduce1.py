@@ -1,16 +1,19 @@
 #!/usr/bin/env -S python3 -u
-"""Reduce 0."""
+"""Reduce 1."""
 import sys
 import itertools
+import re
 
 
 def reduce_one_group(key, group):
     """Reduce one group."""
-    doc_count = 0
+    word_count = ""
     for line in group:
-        count = line.partition("\t")[2]
-        doc_count += int(count)
-    print(f"{doc_count}")
+        line = re.sub(r"[^a-zA-Z0-9 ]+", "", line)
+        line = line.casefold()
+        word_count = line
+    word_count = ""
+    print(f"{line}/t{word_count}")
 
 
 def keyfunc(line):

@@ -1,16 +1,19 @@
 #!/usr/bin/env -S python3 -u
-"""Reduce 0."""
+"""Reduce 3."""
 import sys
 import itertools
 
+# answer should be term: tf-idf score, doc_id, tf fin doc, .....
+
 
 def reduce_one_group(key, group):
+    # get term frequency accross all docs here 
+    # all_docs = len(group)
     """Reduce one group."""
-    doc_count = 0
-    for line in group:
-        count = line.partition("\t")[2]
-        doc_count += int(count)
-    print(f"{doc_count}")
+    # for line in group:
+        # should be grouped by term now
+        # get term frequency accross all docs here 
+        # add the overall term freq 
 
 
 def keyfunc(line):
