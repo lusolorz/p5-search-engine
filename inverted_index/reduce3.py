@@ -4,25 +4,28 @@ import sys
 import itertools
 import math
 
-# answer should be term: tf-idf score, doc_id, tf fin doc, .....
+
+# Answer should be term: tf-idf score, doc_id, tf fin doc, .....
 # term 
 
-#add these all to the same line:
+
+# Add these all to the same line:
 def reduce_one_group(key, group):
+    """Reduce one group."""
     # get term frequency accross all docs here 
     # we can also add to a string and return that
     # and thne deal with it in map with a 4 for loop every four return 4 
-    temp = list(group)
-    terms_all_docs = len(temp)
+    temp_group = list(group)
+    terms_all_docs = len(temp_group)
     with open ('total_document_count.txt') as temp:
-        num_docs =  temp.readline().strip()
+        num_docs = temp.readline().strip()
 
-    """Reduce one group."""
-    for line in group:
-        doc_id = line.partition("\t")[2]
-        tf_score = line.partition("\t")[4]
-        idf_score = math.log10(num_docs/terms_all_docs)
-        print(f"{key}\t{idf_score}\t{doc_id}\t{tf_score}")
+    for line in temp_group:
+        doc_id = line.partition("\t")[2].split()[0]
+        tf_score = line.partition("\t")[2].split()[1]
+        freq = line.partition("\t")[2].split()[2]
+        idf_score = math.log10(int(num_docs)/freq)
+        print(f"{key}\t{idf_score} {doc_id} {tf_score} {freq}")
         # should be grouped by term now
         # get term frequency accross all docs here 
         # add the overall term freq 

@@ -38,14 +38,28 @@ cp output0/part-00000 total_document_count.txt
 
 # Job 1: Parsing
 madoop \
-  -input ${PIPELINE_INPUT} \
+  -input ${PIPELINE_INPUT}\
   -output output1 \
   -mapper ./map1.py \
   -reducer ./reduce1.py
 
 # # Job 2
-# madoop \
-#   -input output1 \
-#   -output output2 \
-#   -mapper ./map2.py \
-#   -reducer ./reduce2.py
+madoop \
+  -input output1 \
+  -output output2 \
+  -mapper ./map2.py \
+  -reducer ./reduce2.py
+
+# # Job 3
+madoop \
+  -input output2 \
+  -output output3 \
+  -mapper ./map3.py \
+  -reducer ./reduce3.py
+
+# # Job 4
+madoop \
+  -input output3 \
+  -output output4 \
+  -mapper ./map4.py \
+  -reducer ./reduce4.py

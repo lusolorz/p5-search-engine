@@ -2,6 +2,7 @@
 """Reduce 2."""
 import sys
 import itertools
+import logging
 
 
 # Reduce to term and frequency of that term across all docs
@@ -28,14 +29,14 @@ def reduce_one_group(key, group):
     temp_dict = {}
     num_words_in_doc = 0
     for line in group:
-        term = line.partition("\t")[2]
-        if term in temp_dict:
+        term = line.partition("\t")[2].strip()
+        if term not in temp_dict:
             temp_dict[term] = 1
         else:
             temp_dict[term] += 1
         num_words_in_doc += 1
     for term in temp_dict:
-        print(f"{term}\t{key}\t{temp_dict[term]/num_words_in_doc}")
+        print(f"{term}\t{key} {temp_dict[term]/num_words_in_doc} {temp_dict[term]}")
 
     # term /tab how many times that term has appeared in all docs
 
