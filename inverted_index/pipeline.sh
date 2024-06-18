@@ -15,7 +15,7 @@
 set -Eeuo pipefail
 
 # Optional input directory argument
-PIPELINE_INPUT=crawl
+PIPELINE_INPUT=example_crawl
 if [ -n "${1-}" ]; then
   PIPELINE_INPUT="$1"
 fi
@@ -35,8 +35,6 @@ madoop \
 
 # Copy document count to a separate file
 cp output0/part-00000 total_document_count.txt
-
-PIPELINE_INPUT = total_document_count.txt
 
 # Job 1: Parsing
 madoop \

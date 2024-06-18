@@ -12,7 +12,7 @@ def reduce_one_group(key, group):
         line = re.sub(r"[^a-zA-Z0-9 ]+", "", line)
         line = line.casefold()
         content += line
-    print(f"{key}/t{content}")
+    print(f"{key}\t{content}")
 
 
 def keyfunc(line):
