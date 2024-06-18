@@ -7,13 +7,12 @@ import re
 
 def reduce_one_group(key, group):
     """Reduce one group."""
-    word_count = ""
+    content = ""
     for line in group:
         line = re.sub(r"[^a-zA-Z0-9 ]+", "", line)
         line = line.casefold()
-        word_count = line
-    word_count = ""
-    print(f"{line}/t{word_count}")
+        content += line
+    print(f"{key}/t{content}")
 
 
 def keyfunc(line):
