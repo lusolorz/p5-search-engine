@@ -13,13 +13,16 @@ def reduce_one_group(key, group):
     # we can also add to a string and return that
     # and thne deal with it in map with a 4 for loop every four return 4 
     temp = list(group)
-    all_docs = len(temp)
+    terms_all_docs = len(temp)
+    with open ('total_document_count.txt') as temp:
+        num_docs =  temp.readline().strip()
+
     """Reduce one group."""
     for line in group:
         doc_id = line.partition("\t")[2]
-        nt = line.partition("\t")[4]
-        idf_score = math.log10(all_docs/nt)
-        print(f"{key}\t{idf_score}\t{doc_id}\t{nt}")
+        tf_score = line.partition("\t")[4]
+        idf_score = math.log10(num_docs/terms_all_docs)
+        print(f"{key}\t{idf_score}\t{doc_id}\t{tf_score}")
         # should be grouped by term now
         # get term frequency accross all docs here 
         # add the overall term freq 

@@ -12,5 +12,4 @@ for term, doc, freq in sys.stdin:
     # with open ('total_document_count.txt') as temp:
     #     num_docs =  temp.readline().strip()
     # idf_calc = math.log10(float(num_docs)/float(line))
-    temp = doc + "  " + freq
-    print(f"{term}\t{temp}")
+    print(f"{term}\t{doc}\t{freq}")

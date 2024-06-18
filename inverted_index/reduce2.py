@@ -26,14 +26,16 @@ import itertools
 def reduce_one_group(key, group):
     """Reduce one group."""
     temp_dict = {}
+    num_words_in_doc = 0
     for line in group:
         term = line.partition("\t")[2]
         if term in temp_dict:
             temp_dict[term] = 1
         else:
             temp_dict[term] += 1
+        num_words_in_doc += 1
     for term in temp_dict:
-        print(f"{term}\t{key}\t{temp_dict[term]}")
+        print(f"{term}\t{key}\t{temp_dict[term]/num_words_in_doc}")
 
     # term /tab how many times that term has appeared in all docs
 
