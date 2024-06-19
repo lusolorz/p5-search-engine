@@ -14,18 +14,18 @@ ALGORITHM = 'sha512'
 # Parse one HTML document at a time.  Note that this is still O(1) memory
 # WRT the number of documents in the dataset.
 HTML = ""
-for doc in sys.stdin:
+for line in sys.stdin:
     # Assume well-formed HTML docs:
     # - Starts with <!DOCTYPE html>
     # - End with </html>
     # - Contains a trailing newline
-    if "<!DOCTYPE html>" in doc:
-        HTML = doc
+    if "<!DOCTYPE html>" in line:
+        HTML = line
     else:
-        HTML += doc
+        HTML += line
 
     # If we're at the end of a document, parse
-    if "</html>" not in doc:
+    if "</html>" not in line:
         continue
 
     # Configure Beautiful Soup parser
