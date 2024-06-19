@@ -11,9 +11,10 @@ import math
 for content in sys.stdin:
     content = content.split("\t")
     term = content[0]
-    idf = content[1].split()[0]
-    doc_id = content[1].split()[1]
-    term_freq = content[1].split()[2]
-    term_freq = content[1].split()[3]
+    second = content[1].split()
+    idf = second[0]
+    doc_id = second[1]
+    term_freq = second[2]
+    weight = second[3]
 
-    print(f"{doc_id}\t{idf} {term} {term_freq}")
+    print(f"{doc_id}\t{idf} {term} {term_freq} {weight}")
