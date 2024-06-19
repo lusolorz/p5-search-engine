@@ -20,12 +20,13 @@ def reduce_one_group(key, group):
     with open ('total_document_count.txt') as temp:
         num_docs = temp.readline().strip()
 
+    counter = 0
+
     for line in temp_group:
         doc_id = line.partition("\t")[2].split()[0]
-        tf_score = line.partition("\t")[2].split()[1]
-        freq = line.partition("\t")[2].split()[2]
-        idf_score = math.log10(int(num_docs)/freq)
-        print(f"{key}\t{idf_score} {doc_id} {tf_score} {freq}")
+        freq = line.partition("\t")[2].split()[1]
+        idf_score = math.log10(int(num_docs)/terms_all_docs)
+        print(f"{key}\t{idf_score} {doc_id} {freq}")
         # should be grouped by term now
         # get term frequency accross all docs here 
         # add the overall term freq 

@@ -23,17 +23,17 @@ def reduce_one_group(key, group):
     for line in group:
     #     # doc_id = line.partition("\t")[0]
         idf_score = line.partition("\t")[2].split()[0]
-        tf_score = line.partition("\t")[2].split()[1]
-        term = line.partition("\t")[2].split()[2]
-        term_freq = line.partition("\t")[2].split()[3]
+        term = line.partition("\t")[2].split()[1]
+        term_freq = line.partition("\t")[2].split()[2]
         if term not in dict_terms:
             dict_terms[term] = {}
             dict_terms[term]['idf_score'] = idf_score
             dict_terms[term]['docs'] = {}
-        sum += (float(idf_score) * float(term_freq)) ** 2
+        sum += ((float(idf_score) * float(term_freq)) ** 2)
         if term not in term_to_freq_to_doc:
             term_to_freq_to_doc[term] = term_freq
-    weight = math.sqrt(sum) * 100
+    # weight = math.sqrt(sum)
+    weight = sum
     for term in term_to_freq_to_doc:
         dict_terms[term]['docs'][key] = {}
         dict_terms[term]['docs'][key]['weight'] = weight

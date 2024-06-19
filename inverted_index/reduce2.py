@@ -36,7 +36,7 @@ def reduce_one_group(key, group):
             temp_dict[term] += 1
         num_words_in_doc += 1
     for term in temp_dict:
-        print(f"{term}\t{key} {temp_dict[term]/num_words_in_doc} {temp_dict[term]}")
+        print(f"{term}\t{key} {temp_dict[term]}")
 
     # term /tab how many times that term has appeared in all docs
 
