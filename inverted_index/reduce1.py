@@ -9,8 +9,8 @@ def reduce_one_group(key, group):
     """Reduce one group."""
     content = ""
     for line in group:
-        line = line.split("\t")
-        line = re.sub(r"[^a-zA-Z0-9 ]+", "", line[1])
+        line = line.partition("\t")
+        line = re.sub(r"[^a-zA-Z0-9 ]+", "", line[2])
         line = line.casefold()
         content += line
     print(f"{key}\t{content}")
