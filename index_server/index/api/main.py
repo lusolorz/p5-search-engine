@@ -134,9 +134,15 @@ def get_docs_with_words_in_query(query):
     dict_of_doc_vectors = {}
     for word in query:
         for doc in inverted_index[word]['docs']:
+            print(f"Processing doc: {doc} for word: {word}")
+            print(f"Current document weights: {docs_to_weights}")
+            print(f"Available docs in index: {inverted_index[word]['docs']}")
             if doc not in docs_to_weights:
                 print(docs_to_weights)
-                docs_to_weights[doc] = inverted_index[word]['docs'][doc]['weight']
+                if doc in inverted_index[word]['docs']:
+                    docs_to_weights[doc] = inverted_index[word]['docs'][doc]['weight']
+                else:
+                    print(f"Warning: Doc {doc} not found in inverted_index for word {word}")
             if doc not in dict_of_doc_vectors:
                 dict_of_doc_vectors[doc] = []
                 for word in query:
