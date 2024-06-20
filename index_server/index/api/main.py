@@ -6,6 +6,7 @@ URLs include:
 /api/v1/comments/<commentid>/
 """
 import flask
+from index import app
 import index
 import os
 import re
@@ -20,7 +21,7 @@ def load_index():
 
     # Load the inverted index
    
-    inverted_index_path = os.path.join(os.path.abspath(__file__), "..", 'inverted_index', flask.current_app.config["INDEX_PATH"])
+    inverted_index_path = os.path.join("./index_server/index/inverted_index", app.config["INDEX_PATH"])
     with open(inverted_index_path, 'r') as f:
         for line in f:
             line = line.split()
