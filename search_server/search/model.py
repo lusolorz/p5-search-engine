@@ -2,7 +2,7 @@
 import sqlite3
 import flask
 import search
-# from search import app
+
 
 def dict_factory(cursor, row):
     """Convert database row objects to a dictionary keyed on column name.
@@ -11,6 +11,7 @@ def dict_factory(cursor, row):
     template. Note that this would be inefficient for large queries.
     """
     return {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
+
 
 def get_db():
     """Open a new database connection.
@@ -29,6 +30,7 @@ def get_db():
 
     return flask.g.sqlite_db
 
+
 @search.app.teardown_appcontext
 def close_db(error):
     """Close the database at the end of a request.
@@ -42,6 +44,7 @@ def close_db(error):
         sqlite_db.commit()
         sqlite_db.close()
 
+
 def get_document_details(docid):
     """Get document details from the database."""
     db = get_db()
@@ -51,3 +54,17 @@ def get_document_details(docid):
     )
     row = cursor.fetchone()
     return row if row else None
+
+
+# def get_document_details(docid):
+#     db = get_db()
+#     cur = db.execute('SELECT * FROM documents WHERE docid = ?', (docid,))
+#     result = cur.fetchone()
+#     if result:
+#         return {
+#             'docid': result['docid'],
+#             'title': result['title'],
+#             'summary': result.get('summary', 'No summary available'),
+#             'url': result['url']
+#         }
+#     return None

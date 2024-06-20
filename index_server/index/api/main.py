@@ -1,10 +1,4 @@
-"""
-REST APT.
-
-URLs include:
-/api/v1/comments/?postid=<postid>
-/api/v1/comments/<commentid>/
-"""
+"""REST APT."""
 import flask
 from index import app
 import index
@@ -12,23 +6,28 @@ import os
 import re
 import math
 
+
 inverted_index = {}
 pagerank = {}
 stopwords = set()
 docs_to_weights = {}
 
+
 def load_index():
+    """Load the inverted index, PageRank, and stopwords."""
     global inverted_index, pagerank, stopwords
 
     # Load the inverted index
-   
-    inverted_index_path = os.path.join("./index_server/index/inverted_index", app.config["INDEX_PATH"])
+    inverted_index_path = os.path.join(
+        "./index_server/index/inverted_index", app.config["INDEX_PATH"]
+    )
     with open(inverted_index_path, 'r') as f:
         for line in f:
             line = line.split()
             word = line[0]
             inverted_index[word] = {}
-            # 00000000 2.7686381012476144 1345509 1 6307.358583064987 8900538 1 140550.31899129925 9315114 2 212561.83132016915
+            # 00000000 2.7686381012476144 1345509 1 6307.358583064987
+            # ... 8900538 1 140550.31899129925 9315114 2 212561.83132016915
             inverted_index[word]['idf'] = float(line[1])
             inverted_index[word]['docs'] = {}
             i = 2
@@ -40,7 +39,6 @@ def load_index():
                 i+=1
                 inverted_index[word]['docs'][doc]['weight'] = float(line[i])
                 i+=1
-
 
     # Load the PageRank values
     pagerank_path = os.path.join("./index_server/index/pagerank.out")
@@ -66,6 +64,7 @@ def get_api_v1():
     }
     # Return the context
     return flask.jsonify(**context)
+
 
 # GET /api/v1/hits/
 @index.app.route('/api/v1/hits/', methods=['GET'])
@@ -98,11 +97,10 @@ def get_api_v1_hits():
         query_tfidf_vec_magnitude += point ** 2
     query_tfidf_vec_magnitude = math.sqrt(query_tfidf_vec_magnitude)
 
-    #compute numerator aka dot product of vectors 
+    # compute numerator aka dot product of vectors
     content = {}
     content['hits'] = []
 
-    
     print(len(dict_of_docs_with_vectors))
     count = 0
     for doc in dict_of_docs_with_vectors:
@@ -123,7 +121,9 @@ def get_api_v1_hits():
                 dot_product += query_tfidf_vec[i] * dict_of_docs_with_vectors[doc][i]
         # print(docs_to_weights)
         if dot_product != 0:
-            normalization = dot_product/(query_tfidf_vec_magnitude * math.sqrt(docs_to_weights[doc]))
+            normalization = dot_product/(
+                query_tfidf_vec_magnitude * math.sqrt(docs_to_weights[doc])
+            )
             score = w * pagerank[doc] + (1-w) * normalization
             content_doc_dict = {}
             content_doc_dict['docid'] = int(doc)
@@ -131,8 +131,9 @@ def get_api_v1_hits():
             content['hits'].append(content_doc_dict)
     content['hits'] = sorted(content['hits'], key=lambda x: x['score'], reverse=True)
     # print(content['hits'])
-    
+
     return flask.jsonify(content)
+
 
 def compute_query_vector(query):
     q_tf = {}
@@ -163,7 +164,9 @@ def get_docs_with_all_words_in_query(query):
                 dict_of_doc_vectors[doc] = []
                 for word in query:
                     if doc in inverted_index[word]['docs']:
-                        dict_of_doc_vectors[doc].append(inverted_index[word]['docs'][doc]['term_freq']*inverted_index[word]['idf'])
+                        dict_of_doc_vectors[doc].append(
+                            inverted_index[word]['docs'][doc]['term_freq']*inverted_index[word]['idf']
+                        )
                     else:
                         dict_of_doc_vectors[doc].append(0)
         # for word in query:
@@ -180,7 +183,7 @@ def get_docs_with_all_words_in_query(query):
     #                 dict_of_doc_vectors[word][doc].append(inverted_index[word]['docs'][doc]['term_freq']*inverted_index[word]['idf'])
     #             else:
     #                 dict_of_doc_vectors[word][doc].append(0)
-    
+
     return dict_of_doc_vectors
 
 # list_of_docs.append((doc, inverted_index[word][doc]['term_freq'], inverted_index[word][doc]['weight']))
