@@ -72,7 +72,7 @@ def get_api_v1():
 def get_api_v1_hits():
     w = 0.5
     if flask.request.args.get('w'):
-        w = flask.request.args.get('w')
+        w = float(flask.request.args.get('w'))
     query = flask.request.args.get('q')
     query = re.sub(r"[^a-zA-Z0-9 ]+", "", query)
     query = query.casefold()
@@ -87,7 +87,7 @@ def get_api_v1_hits():
     query_tfidf_vec = compute_query_vector(query)
 
     # for loop for all docs containg words in query:
-    dict_of_docs_with_vectors = get_docs_with_words_in_query(query)
+    dict_of_docs_with_vectors = get_docs_with_all_words_in_query(query)
 
     query_tfidf_vec_magnitude = 0
     for point in query_tfidf_vec:
@@ -99,19 +99,30 @@ def get_api_v1_hits():
     content['hits'] = []
 
     
-
+    print(len(dict_of_docs_with_vectors))
+    count = 0
     for doc in dict_of_docs_with_vectors:
-        content_doc_dict = {}
-        content_doc_dict['docid'] = doc
         dot_product = 0
-        print(str(len(query_tfidf_vec)))
+        # print(str(len(query_tfidf_vec)))
         # print(len(dict_of_docs_with_vectors[doc]))
         for i in range(len(query_tfidf_vec)):
-            dot_product += query_tfidf_vec[i] * dict_of_docs_with_vectors[doc][i]
-        print(docs_to_weights)
-        normalization = dot_product/(query_tfidf_vec_magnitude * math.sqrt(docs_to_weights[doc]))
-        score = w * pagerank[doc] + (1-w) * normalization
-        content_doc_dict['score'] = score
+            if dict_of_docs_with_vectors[doc][i] == 0:
+                dot_product = 0
+                count += 1
+                # print(doc)
+                break
+            else:
+                dot_product += query_tfidf_vec[i] * dict_of_docs_with_vectors[doc][i]
+        # print(docs_to_weights)
+        if dot_product != 0:
+            normalization = dot_product/(query_tfidf_vec_magnitude * math.sqrt(docs_to_weights[doc]))
+            score = w * pagerank[doc] + (1-w) * normalization
+            content_doc_dict = {}
+            content_doc_dict['docid'] = int(doc)
+            content_doc_dict['score'] = score
+            content['hits'].append(content_doc_dict)
+    content['hits'] = sorted(content['hits'], key=lambda x: x['score'], reverse=True)
+    print(content['hits'])
     
     return flask.jsonify(content)
 
@@ -130,19 +141,16 @@ def compute_query_vector(query):
     return q_tf_idf_vector
 
 
-def get_docs_with_words_in_query(query):
+def get_docs_with_all_words_in_query(query):
     dict_of_doc_vectors = {}
     for word in query:
         for doc in inverted_index[word]['docs']:
-            print(f"Processing doc: {doc} for word: {word}")
-            print(f"Current document weights: {docs_to_weights}")
-            print(f"Available docs in index: {inverted_index[word]['docs']}")
+            # print(f"Processing doc: {doc} for word: {word}")
+            # print(f"Available docs in index: {inverted_index[word]['docs']}")
             if doc not in docs_to_weights:
-                print(docs_to_weights)
+                # print(docs_to_weights)
                 if doc in inverted_index[word]['docs']:
                     docs_to_weights[doc] = inverted_index[word]['docs'][doc]['weight']
-                else:
-                    print(f"Warning: Doc {doc} not found in inverted_index for word {word}")
             if doc not in dict_of_doc_vectors:
                 dict_of_doc_vectors[doc] = []
                 for word in query:
