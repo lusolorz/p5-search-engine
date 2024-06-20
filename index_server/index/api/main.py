@@ -81,6 +81,10 @@ def get_api_v1_hits():
     for word in query:
         if word not in stopwords and word in inverted_index:
             temp_list_for_query.append(word)
+        elif word not in inverted_index and word not in stopwords:
+            content = {}
+            content['hits'] = []
+            return flask.jsonify(content)
     query = temp_list_for_query
 
 
@@ -103,9 +107,13 @@ def get_api_v1_hits():
     count = 0
     for doc in dict_of_docs_with_vectors:
         dot_product = 0
-        # print(str(len(query_tfidf_vec)))
+        print(str(len(query_tfidf_vec)))
         # print(len(dict_of_docs_with_vectors[doc]))
+        if len(dict_of_docs_with_vectors[doc]) != len(query_tfidf_vec):
+            print("here1")
+            break
         for i in range(len(query_tfidf_vec)):
+            print("here2")
             if dict_of_docs_with_vectors[doc][i] == 0:
                 dot_product = 0
                 count += 1
@@ -122,7 +130,7 @@ def get_api_v1_hits():
             content_doc_dict['score'] = score
             content['hits'].append(content_doc_dict)
     content['hits'] = sorted(content['hits'], key=lambda x: x['score'], reverse=True)
-    print(content['hits'])
+    # print(content['hits'])
     
     return flask.jsonify(content)
 
@@ -145,7 +153,7 @@ def get_docs_with_all_words_in_query(query):
     dict_of_doc_vectors = {}
     for word in query:
         for doc in inverted_index[word]['docs']:
-            # print(f"Processing doc: {doc} for word: {word}")
+            print(f"Processing doc: {doc} for word: {word}")
             # print(f"Available docs in index: {inverted_index[word]['docs']}")
             if doc not in docs_to_weights:
                 # print(docs_to_weights)
