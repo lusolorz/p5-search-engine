@@ -1,1 +1,43 @@
 #!/bin/bash
+
+DB_PATH="var/search.sqlite3"
+SQL_FILE="search_server/search/sql/search.sql"
+
+create_db() {
+    if [ -f "$DB_PATH" ]; then
+        echo "Error: database already exists"
+        exit 1
+    fi
+
+    echo "creating database ..."
+    mkdir -p var/
+    sqlite3 "$DB_PATH" < "$SQL_FILE"
+}
+
+destroy_db() {
+    echo "destroying database ..."
+    rm -f "$DB_PATH"
+}
+
+reset_db() {
+    echo "resetting database ..."
+    rm -f "$DB_PATH"
+    mkdir -p var/
+    sqlite3 "$DB_PATH" < "$SQL_FILE"
+}
+
+case "$1" in
+    create)
+        create_db
+        ;;
+    destroy)
+        destroy_db
+        ;;
+    reset)
+        reset_db
+        ;;
+    *)
+        echo "Usage: $0 {create|destroy|reset}"
+        exit 1
+        ;;
+esac
