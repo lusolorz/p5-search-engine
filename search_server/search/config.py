@@ -12,6 +12,14 @@ SESSION_COOKIE_NAME = 'login'
 
 # File Upload to var/uploads/
 SEARCH_SERVER_ROOT = pathlib.Path(__file__).resolve().parent.parent
+
+# # Add search_server and index_server to sys.path
+# search_server_path = os.path.abspath('/path/to/search_server')
+# index_server_path = os.path.abspath('/path/to/index_server')
+
+# sys.path.insert(0, search_server_path)
+# sys.path.insert(0, index_server_path)
+
 # UPLOAD_FOLDER = INSTA485_ROOT/'var'/'uploads'
 # ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 MAX_CONTENT_LENGTH = 16 * 1024 * 1024

@@ -21,8 +21,8 @@ def search():
     return render_template('index.html', results=results)
 
 def get_request(query, weight, url, all_results):
+    full_url = f"{url}?q={query}&w={weight}"
     try:
-        full_url = f"{url}/?q={query}&w={weight}"
         r = requests.get(full_url)
         r.raise_for_status()  # Check if the request was successful
         r = r.json()['hits']
@@ -32,11 +32,24 @@ def get_request(query, weight, url, all_results):
         all_results.append(results)
     except requests.exceptions.RequestException as e:
         # Log the exception and continue
-        print(f"Error fetching from {url}: {e}")
+        print(f"Error fetching from {full_url}: {e}")
 
 
-def get_search_results(query, weight):
-    payload = {'q': query, 'w': weight}
+def get_search_results(og_query, weight):
+    payload = {'q': og_query, 'w': weight}
+
+    query = ""
+
+    # Split the original query into words
+    words = og_query.split()
+
+    # Iterate through each word
+    for i, word in enumerate(words):
+        # Add the word to the query string
+        query += word
+        # Add a '+' if it's not the last word
+        if i < len(words) - 1:
+            query += '+'
 
     all_results = []
 
