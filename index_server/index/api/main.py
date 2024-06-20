@@ -108,8 +108,8 @@ def get_api_v1_hits():
         # print(len(dict_of_docs_with_vectors[doc]))
         for i in range(len(query_tfidf_vec)):
             dot_product += query_tfidf_vec[i] * dict_of_docs_with_vectors[doc][i]
-        print(str(len(dict_of_docs_with_vectors)))
-        normalization = dot_product/(query_tfidf_vec_magnitude * docs_to_weights[doc])
+        print(docs_to_weights)
+        normalization = dot_product/(query_tfidf_vec_magnitude * math.sqrt(docs_to_weights[doc]))
         score = w * pagerank[doc] + (1-w) * normalization
         content_doc_dict['score'] = score
     
@@ -134,6 +134,9 @@ def get_docs_with_words_in_query(query):
     dict_of_doc_vectors = {}
     for word in query:
         for doc in inverted_index[word]['docs']:
+            if doc not in docs_to_weights:
+                print(docs_to_weights)
+                docs_to_weights[doc] = inverted_index[word]['docs'][doc]['weight']
             if doc not in dict_of_doc_vectors:
                 dict_of_doc_vectors[doc] = []
                 for word in query:
