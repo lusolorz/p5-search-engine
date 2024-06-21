@@ -92,17 +92,17 @@ def get_api_v1_hits():
     # for loop for all docs containg words in query:
     dict_of_docs_with_vectors = get_docs_with_all_words_in_query(query)
 
-    query_tfidf_vec_magnitude = 0
-    for point in query_tfidf_vec:
-        query_tfidf_vec_magnitude += point ** 2
-    query_tfidf_vec_magnitude = math.sqrt(query_tfidf_vec_magnitude)
+    # query_tfidf_vec_magnitude = 0
+    # for point in query_tfidf_vec:
+    #     query_tfidf_vec_magnitude += point ** 2
+    # query_tfidf_vec_magnitude = math.sqrt(query_tfidf_vec_magnitude)
 
     # compute numerator aka dot product of vectors
     content = {}
     content['hits'] = []
 
     # print(len(dict_of_docs_with_vectors))
-    count = 0
+    # count = 0
     for doc, doc_vector in dict_of_docs_with_vectors.items():
         dot_product = 0
         if len(doc_vector) != len(query_tfidf_vec):
@@ -110,13 +110,13 @@ def get_api_v1_hits():
         for i, value in enumerate(query_tfidf_vec):
             if doc_vector[i] == 0:
                 dot_product = 0
-                count += 1
+                # count += 1
                 break
             dot_product += value * doc_vector[i]
         if dot_product != 0:
             normalization = (
                 dot_product / (
-                    query_tfidf_vec_magnitude * math.sqrt(docs_to_weights[doc])
+                    mag_h(query_tfidf_vec) * math.sqrt(docs_to_weights[doc])
                 )
             )
             # score = w * pagerank.get(doc, 0.0) + (1 - w) * normalization
@@ -132,39 +132,14 @@ def get_api_v1_hits():
 
     return flask.jsonify(content)
 
-    # for doc in dict_of_docs_with_vectors:
-    #     dot_product = 0
-    #     # print(str(len(query_tfidf_vec)))
-    #     # print(len(dict_of_docs_with_vectors[doc]))
-    #     if len(dict_of_docs_with_vectors[doc]) != len(query_tfidf_vec):
-    #         break
-    #     for i in range(len(query_tfidf_vec)):
-    #         if dict_of_docs_with_vectors[doc][i] == 0:
-    #             dot_product = 0
-    #             count += 1
-    #             # print(doc)
-    #             break
-    #         dot_product += (
-    #             query_tfidf_vec[i] * dict_of_docs_with_vectors[doc][i]
-    #         )
-    #     # print(docs_to_weights)
-    #     if dot_product != 0:
-    #         normalization = dot_product/(
-    #             query_tfidf_vec_magnitude * math.sqrt(docs_to_weights[doc])
-    #         )
-    #         # score = w * pagerank[doc] + (1-w) * normalization
-    #         content_doc_dict = {}
-    #         content_doc_dict['docid'] = int(doc)
-    #         content_doc_dict['score'] = (
-    #             w * pagerank[doc] + (1-w) * normalization
-    #         )
-    #         content['hits'].append(content_doc_dict)
-    # content['hits'] = sorted(
-    #     content['hits'], key=lambda x: x['score'], reverse=True
-    # )
-    # # print(content['hits'])
 
-    # return flask.jsonify(content)
+def mag_h(query_tfidf_vec):
+    """Compute the magnitude."""
+    query_tfidf_vec_magnitude = 0
+    for point in query_tfidf_vec:
+        query_tfidf_vec_magnitude += point ** 2
+    query_tfidf_vec_magnitude = math.sqrt(query_tfidf_vec_magnitude)
+    return query_tfidf_vec_magnitude
 
 
 def compute_query_vector(query):
