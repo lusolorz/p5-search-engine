@@ -1,13 +1,8 @@
 #!/usr/bin/env -S python3 -u
 """Map 4."""
 import sys
-import re
-import math
-
 
 # Passed in term /t idf score " " doc  " " tf " " freq
-
-
 for content in sys.stdin:
     content = content.split("\t")
     term = content[0]

@@ -1,13 +1,8 @@
 #!/usr/bin/env -S python3 -u
 """Map 3."""
 import sys
-import re
-import math
-
 
 # Passed in term /t doc /t freq in doc
-
-
 for content in sys.stdin:
     content = content.split("\t")
     term = content[0]

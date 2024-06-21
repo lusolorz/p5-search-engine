@@ -2,17 +2,17 @@
 """Reduce 5."""
 import sys
 import itertools
-import math
 
 # answer should be term: tf-idf score, doc_id, tf fin doc, .....
-# term 
+# term
 temp_group = []
 term_dict = {}
-#term:tf idf score, list of docs with weights 
-#add these all to the same line:
+# term:tf idf score, list of docs with weights
+# add these all to the same line:
+
+
 def reduce_one_group(key, group):
     """Reduce one group."""
-
     # Process each line in the group and store the relevant parts in tuples
     for line in group:
         parts = line.partition("\t")[2].split()
@@ -25,8 +25,7 @@ def reduce_one_group(key, group):
         term_dict[term].append((idf, key, term_freq, weight))
 
     # Sort the list of tuples by the first element (term)
-        
-    
+
 
 def keyfunc(line):
     """Return the key from a TAB-delimited key-value pair."""
@@ -37,7 +36,7 @@ def main():
     """Divide sorted lines into groups that share a key."""
     for key, group in itertools.groupby(sys.stdin, keyfunc):
         reduce_one_group(key, group)
-    
+
     sorted_keys = sorted(term_dict.keys())
 
     # Print the sorted results
@@ -50,6 +49,7 @@ def main():
             # line += f"{item}"
             line += f" {doc_id} {term_freq} {weight}"
         print(line)
+
 
 if __name__ == "__main__":
     main()

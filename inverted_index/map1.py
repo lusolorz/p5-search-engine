@@ -5,11 +5,9 @@ import hashlib
 import bs4
 
 
-# Map each term to a document 
-
+# Map each term to a document
 
 ALGORITHM = 'sha512'
-
 
 # Parse one HTML document at a time.  Note that this is still O(1) memory
 # WRT the number of documents in the dataset.
@@ -45,7 +43,7 @@ for line in sys.stdin:
     doc_id = hash_obj.hexdigest()
     # Mod by 10^7 to limit the length of the doc_id
     doc_id = int(doc_id, 16) % (10**7)
-    
-    # FIXME Map 1 output.  Emit one line for each document, including the doc
+
+    # Map 1 output.  Emit one line for each document, including the doc
     # ID and document content (You will need them later!)
     print(f"{doc_id}\t{content}")

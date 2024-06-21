@@ -1,11 +1,9 @@
 #!/usr/bin/env -S python3 -u
 """Map 2."""
 import sys
-import re
-
 
 stopwords = []
-with open ("stopwords.txt", "r") as temp:
+with open("stopwords.txt", "r", encoding="utf-8") as temp:
     for line in temp:
         stopwords.append(line.strip())
 

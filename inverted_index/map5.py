@@ -1,9 +1,6 @@
 #!/usr/bin/env -S python3 -u
 """Map 5."""
 import sys
-import re
-import math
-
 
 # Passed in term /t idf score " " doc  " " tf " " freq
 # {term}\t{idf} {docid} {tf} {weight}
