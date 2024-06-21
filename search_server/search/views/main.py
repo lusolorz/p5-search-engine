@@ -31,10 +31,11 @@ def search_for_docs():
         )
         temp = cursor.fetchone()
         temp_dict = {}
-        temp_dict['title'] = temp['title']
-        temp_dict['summary'] = temp['summary']
-        temp_dict['url'] = temp['url']
-        results_w_db['results'].append(temp_dict)
+        if temp:
+            temp_dict['title'] = temp['title']
+            temp_dict['summary'] = temp['summary']
+            temp_dict['url'] = temp['url']
+            results_w_db['results'].append(temp_dict)
 
     return render_template('index.html', **results_w_db)
 
