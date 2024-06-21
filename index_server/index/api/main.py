@@ -3,7 +3,7 @@ import os
 import re
 import math
 import flask
-from index import app
+# from index import app
 import index
 
 
@@ -19,7 +19,7 @@ def load_index():
 
     # Load the inverted index
     inverted_index_path = os.path.join(
-        "./index_server/index/inverted_index", app.config["INDEX_PATH"]
+        "./index_server/index/inverted_index", index.app.config["INDEX_PATH"]
     )
     with open(inverted_index_path, 'r', encoding='utf-8') as f:
         for line in f:
@@ -107,12 +107,12 @@ def get_api_v1_hits():
         dot_product = 0
         if len(doc_vector) != len(query_tfidf_vec):
             break
-        for i in range(len(query_tfidf_vec)):
+        for i, value in enumerate(query_tfidf_vec):
             if doc_vector[i] == 0:
                 dot_product = 0
                 count += 1
                 break
-            dot_product += query_tfidf_vec[i] * doc_vector[i]
+            dot_product += value * doc_vector[i]
         if dot_product != 0:
             normalization = (
                 dot_product / (
@@ -177,8 +177,8 @@ def compute_query_vector(query):
             q_tf[word] += 1
 
     q_tf_idf_vector = []
-    for word in q_tf:
-        q_tf_idf_vector.append(q_tf[word] * inverted_index[word]['idf'])
+    for word, count in q_tf.items():
+        q_tf_idf_vector.append(count * inverted_index[word]['idf'])
 
     return q_tf_idf_vector
 
@@ -200,8 +200,10 @@ def get_docs_with_all_words_in_query(query):
                 dict_of_doc_vectors[doc] = []
                 for word in query:
                     if doc in inverted_index[word]['docs']:
+                        tf = inverted_index[word]['docs'][doc]['term_freq']
+                        idf = inverted_index[word]['idf']
                         dict_of_doc_vectors[doc].append(
-                            inverted_index[word]['docs'][doc]['term_freq']*inverted_index[word]['idf']
+                            tf*idf
                         )
                     else:
                         dict_of_doc_vectors[doc].append(0)
