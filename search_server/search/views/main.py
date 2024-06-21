@@ -11,6 +11,8 @@ import search
 @search.app.route('/')
 def search_for_docs():
     """Search for documents."""
+    connection = search.model.get_db()
+    cursor = connection.cursor()
     query = request.args.get('q', '')
     weight = request.args.get('w', 0.5)
 
@@ -19,13 +21,27 @@ def search_for_docs():
     else:
         results = []
 
-    return render_template('index.html', results=results)
+    results_w_db = {}
+    results_w_db['results'] = []
+
+    for result in results:
+        cursor.execute(
+            "SELECT * FROM Documents WHERE docid = ? ",
+            (str(result[0]),)
+        )
+        temp = cursor.fetchone()
+        temp_dict = {}
+        temp_dict['title'] = temp['title']
+        temp_dict['summary'] = temp['summary']
+        temp_dict['url'] = temp['url']
+        results_w_db['results'].append(temp_dict)
+
+    return render_template('index.html', **results_w_db)
 
 
 def get_request(query, weight, url, all_results):
     """GET request."""
     full_url = f"{url}?q={query}&w={weight}"
-    print(f"full_url={full_url}")
     try:
         r = requests.get(full_url, timeout=10)
         r.raise_for_status()  # Check if the request was successful
@@ -106,7 +122,9 @@ def get_search_results(og_query, weight):
     all_results = []
 
     threads = {}
-    for index, url in enumerate(search.app.config["SEARCH_INDEX_SEGMENT_API_URLS"]):
+    for index, url in enumerate(
+        search.app.config["SEARCH_INDEX_SEGMENT_API_URLS"]
+    ):
         thread_name = f"thread{index + 1}"
         threads[thread_name] = threading.Thread(
             target=get_request, args=(query, weight, url, all_results)
@@ -129,7 +147,11 @@ def get_search_results(og_query, weight):
     # Convert the merged_results iterator to a list if needed
     merged_results = list(merged_results)
 
-    return merged_results[:9]
+    # Return the results
+    print(merged_results)
+    if (len(merged_results)) <= 10:
+        return merged_results
+    return merged_results[:10]
 
 
 # r = requests.get('https://api.github.com/user')

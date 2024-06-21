@@ -19,7 +19,7 @@ SEARCH_SERVER_ROOT = pathlib.Path(__file__).resolve().parent.parent
 # MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 
 # Database file is var/insta485.sqlite3
-DATABASE_FILENAME = SEARCH_SERVER_ROOT/'var'/'search.sqlite3'
+DATABASE_FILENAME = 'var/search.sqlite3'
 
 # From spec for p5
 SEARCH_INDEX_SEGMENT_API_URLS = [
