@@ -3,7 +3,7 @@ import heapq
 import threading
 import requests
 from flask import request, render_template
-from search.config import SEARCH_INDEX_SEGMENT_API_URLS
+# from search.config import SEARCH_INDEX_SEGMENT_API_URLS
 # from search.model import get_document_details
 import search
 
@@ -25,6 +25,7 @@ def search_for_docs():
 def get_request(query, weight, url, all_results):
     """GET request."""
     full_url = f"{url}?q={query}&w={weight}"
+    print(f"full_url={full_url}")
     try:
         r = requests.get(full_url, timeout=10)
         r.raise_for_status()  # Check if the request was successful
@@ -105,7 +106,7 @@ def get_search_results(og_query, weight):
     all_results = []
 
     threads = {}
-    for index, url in enumerate(SEARCH_INDEX_SEGMENT_API_URLS):
+    for index, url in enumerate(search.app.config["SEARCH_INDEX_SEGMENT_API_URLS"]):
         thread_name = f"thread{index + 1}"
         threads[thread_name] = threading.Thread(
             target=get_request, args=(query, weight, url, all_results)
