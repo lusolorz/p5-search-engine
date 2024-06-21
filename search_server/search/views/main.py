@@ -24,7 +24,7 @@ def get_request(query, weight, url, all_results):
     """GET request."""
     full_url = f"{url}?q={query}&w={weight}"
     try:
-        r = requests.get(full_url)
+        r = requests.get(full_url, timeout=10)
         r.raise_for_status()  # Check if the request was successful
         r = r.json()['hits']
 
@@ -36,60 +36,87 @@ def get_request(query, weight, url, all_results):
         print(f"Error fetching from {full_url}: {e}")
 
 
+# def get_search_results(og_query, weight):
+#     """Get search results."""
+#     # payload = {'q': og_query, 'w': weight}
+#     query = ""
+
+#     # Split the original query into words
+#     words = og_query.split()
+
+#     # Iterate through each word
+#     for i, word in enumerate(words):
+#         # Add the word to the query string
+#         query += word
+#         # Add a '+' if it's not the last word
+#         if i < len(words) - 1:
+#             query += '+'
+
+#     all_results = []
+
+#     threads = {
+#         "thread1": threading.Thread(
+#             target=get_request, args = (
+#                 query, weight, SEARCH_INDEX_SEGMENT_API_URLS[0], all_results
+#             )
+#         ),
+#         "thread2": threading.Thread(
+#             target=get_request, args = (
+#                 query, weight, SEARCH_INDEX_SEGMENT_API_URLS[1], all_results
+#             )
+#         ),
+#         "thread3": threading.Thread(
+#             target=get_request, args = (
+#                 query, weight, SEARCH_INDEX_SEGMENT_API_URLS[2], all_results
+#             )
+#         )
+#     }
+
+#     for thread in threads:
+#         threads[thread].start()
+#     for thread in threads:
+#         threads[thread].join()
+
+#     # Use heapq.merge to merge all results, sorted by score
+#     # heapq.merge expects multiple sorted inputs, so we ensure each results list is sorted
+#     merged_results = heapq.merge(
+#         *[
+#             sorted(results, key=lambda x: x[1], reverse=True) for results in all_results
+#         ], key=lambda x: x[1], reverse=True)
+
+#     # Convert the merged_results iterator to a list if needed
+#     merged_results = list(merged_results)
+
+#     # Loop through each URL to get the results
+
+#     # Return the merged results
+#     return merged_results[:9]
+
+
 def get_search_results(og_query, weight):
     """Get search results."""
-    # payload = {'q': og_query, 'w': weight}
-    query = ""
-
-    # Split the original query into words
-    words = og_query.split()
-
-    # Iterate through each word
-    for i, word in enumerate(words):
-        # Add the word to the query string
-        query += word
-        # Add a '+' if it's not the last word
-        if i < len(words) - 1:
-            query += '+'
+    query = "+".join(og_query.split())
 
     all_results = []
 
-    threads = {
-        "thread1": threading.Thread(
-            target=get_request, args = (
-                query, weight, SEARCH_INDEX_SEGMENT_API_URLS[0], all_results
-            )
-        ),
-        "thread2": threading.Thread(
-            target=get_request, args = (
-                query, weight, SEARCH_INDEX_SEGMENT_API_URLS[1], all_results
-            )
-        ),
-        "thread3": threading.Thread(
-            target=get_request, args = (
-                query, weight, SEARCH_INDEX_SEGMENT_API_URLS[2], all_results
-            )
+    threads = {}
+    for index, url in enumerate(SEARCH_INDEX_SEGMENT_API_URLS):
+        thread_name = f"thread{index + 1}"
+        threads[thread_name] = threading.Thread(
+            target=get_request, args=(query, weight, url, all_results)
         )
-    }
+        threads[thread_name].start()
 
-    for thread in threads:
-        threads[thread].start()
-    for thread in threads:
-        threads[thread].join()
+    for thread in threads.values():
+        thread.join()
 
     # Use heapq.merge to merge all results, sorted by score
-    # heapq.merge expects multiple sorted inputs, so we ensure each results list is sorted
-    merged_results = heapq.merge(
-        *[
-            sorted(results, key=lambda x: x[1], reverse=True) for results in all_results
-        ], key=lambda x: x[1], reverse=True)
+    sorted_results = [sorted(results, key=lambda x: x[1], reverse=True) for results in all_results]
+    merged_results = heapq.merge(*sorted_results, key=lambda x: x[1], reverse=True)
 
     # Convert the merged_results iterator to a list if needed
     merged_results = list(merged_results)
 
-    # Loop through each URL to get the results
-
-    # Return the merged results
     return merged_results[:9]
 
 
