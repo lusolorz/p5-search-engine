@@ -2,8 +2,9 @@ import flask
 
 
 app = flask.Flask(__name__)
-app.config.from_pyfile('config.py')
 
+# Read settings from config module (insta485/config.py)
+app.config.from_pyfile('config.py')
 
 # Tell our app about views and model.  This is dangerously close to a
 # circular import, which is naughty, but Flask was designed that way.
