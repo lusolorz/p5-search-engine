@@ -1,10 +1,10 @@
 """REST APT."""
-import flask
-from index import app
-import index
 import os
 import re
 import math
+import flask
+from index import app
+import index
 
 
 inverted_index = {}
@@ -21,7 +21,7 @@ def load_index():
     inverted_index_path = os.path.join(
         "./index_server/index/inverted_index", app.config["INDEX_PATH"]
     )
-    with open(inverted_index_path, 'r') as f:
+    with open(inverted_index_path, 'r', encoding='utf-8') as f:
         for line in f:
             line = line.split()
             word = line[0]
@@ -34,22 +34,22 @@ def load_index():
             while i < len(line):
                 doc = line[i]
                 inverted_index[word]['docs'][line[i]] = {}
-                i+=1
+                i += 1
                 inverted_index[word]['docs'][doc]['term_freq'] = int(line[i])
-                i+=1
+                i += 1
                 inverted_index[word]['docs'][doc]['weight'] = float(line[i])
-                i+=1
+                i += 1
 
     # Load the PageRank values
     pagerank_path = os.path.join("./index_server/index/pagerank.out")
-    with open(pagerank_path, 'r') as f:
+    with open(pagerank_path, 'r', encoding='utf-8') as f:
         for line in f:
             doc, rank = line.split(',')
             pagerank[doc] = float(rank)
 
     # Load the stopwords
     stopwords_path = os.path.join("./index_server/index/stopwords.txt")
-    with open(stopwords_path, 'r') as f:
+    with open(stopwords_path, 'r', encoding='utf-8') as f:
         stopwords = set(word.strip() for word in f)
 
 
@@ -69,6 +69,7 @@ def get_api_v1():
 # GET /api/v1/hits/
 @index.app.route('/api/v1/hits/', methods=['GET'])
 def get_api_v1_hits():
+    """Return API v1 hits."""
     w = 0.5
     if flask.request.args.get('w'):
         w = float(flask.request.args.get('w'))
@@ -86,7 +87,6 @@ def get_api_v1_hits():
             return flask.jsonify(content)
     query = temp_list_for_query
 
-
     query_tfidf_vec = compute_query_vector(query)
 
     # for loop for all docs containg words in query:
@@ -101,41 +101,74 @@ def get_api_v1_hits():
     content = {}
     content['hits'] = []
 
-    print(len(dict_of_docs_with_vectors))
+    # print(len(dict_of_docs_with_vectors))
     count = 0
-    for doc in dict_of_docs_with_vectors:
+    for doc, doc_vector in dict_of_docs_with_vectors.items():
         dot_product = 0
-        print(str(len(query_tfidf_vec)))
-        # print(len(dict_of_docs_with_vectors[doc]))
-        if len(dict_of_docs_with_vectors[doc]) != len(query_tfidf_vec):
-            print("here1")
+        if len(doc_vector) != len(query_tfidf_vec):
             break
         for i in range(len(query_tfidf_vec)):
-            print("here2")
-            if dict_of_docs_with_vectors[doc][i] == 0:
+            if doc_vector[i] == 0:
                 dot_product = 0
                 count += 1
-                # print(doc)
                 break
-            else:
-                dot_product += query_tfidf_vec[i] * dict_of_docs_with_vectors[doc][i]
-        # print(docs_to_weights)
+            dot_product += query_tfidf_vec[i] * doc_vector[i]
         if dot_product != 0:
-            normalization = dot_product/(
-                query_tfidf_vec_magnitude * math.sqrt(docs_to_weights[doc])
+            normalization = (
+                dot_product / (
+                    query_tfidf_vec_magnitude * math.sqrt(docs_to_weights[doc])
+                )
             )
-            score = w * pagerank[doc] + (1-w) * normalization
-            content_doc_dict = {}
-            content_doc_dict['docid'] = int(doc)
-            content_doc_dict['score'] = score
+            # score = w * pagerank.get(doc, 0.0) + (1 - w) * normalization
+            content_doc_dict = {
+                'docid': int(doc),
+                'score': w * pagerank.get(doc, 0.0) + (1 - w) * normalization
+            }
             content['hits'].append(content_doc_dict)
-    content['hits'] = sorted(content['hits'], key=lambda x: x['score'], reverse=True)
-    # print(content['hits'])
+
+    content['hits'] = sorted(
+        content['hits'], key=lambda x: x['score'], reverse=True
+    )
 
     return flask.jsonify(content)
 
+    # for doc in dict_of_docs_with_vectors:
+    #     dot_product = 0
+    #     # print(str(len(query_tfidf_vec)))
+    #     # print(len(dict_of_docs_with_vectors[doc]))
+    #     if len(dict_of_docs_with_vectors[doc]) != len(query_tfidf_vec):
+    #         break
+    #     for i in range(len(query_tfidf_vec)):
+    #         if dict_of_docs_with_vectors[doc][i] == 0:
+    #             dot_product = 0
+    #             count += 1
+    #             # print(doc)
+    #             break
+    #         dot_product += (
+    #             query_tfidf_vec[i] * dict_of_docs_with_vectors[doc][i]
+    #         )
+    #     # print(docs_to_weights)
+    #     if dot_product != 0:
+    #         normalization = dot_product/(
+    #             query_tfidf_vec_magnitude * math.sqrt(docs_to_weights[doc])
+    #         )
+    #         # score = w * pagerank[doc] + (1-w) * normalization
+    #         content_doc_dict = {}
+    #         content_doc_dict['docid'] = int(doc)
+    #         content_doc_dict['score'] = (
+    #             w * pagerank[doc] + (1-w) * normalization
+    #         )
+    #         content['hits'].append(content_doc_dict)
+    # content['hits'] = sorted(
+    #     content['hits'], key=lambda x: x['score'], reverse=True
+    # )
+    # # print(content['hits'])
+
+    # return flask.jsonify(content)
+
 
 def compute_query_vector(query):
+    """Compute the query vector."""
     q_tf = {}
     for word in query:
         if word not in q_tf:
@@ -151,15 +184,18 @@ def compute_query_vector(query):
 
 
 def get_docs_with_all_words_in_query(query):
+    """Retreive the docs that have all the words in a query."""
     dict_of_doc_vectors = {}
     for word in query:
         for doc in inverted_index[word]['docs']:
-            print(f"Processing doc: {doc} for word: {word}")
+            # print(f"Processing doc: {doc} for word: {word}")
             # print(f"Available docs in index: {inverted_index[word]['docs']}")
             if doc not in docs_to_weights:
                 # print(docs_to_weights)
                 if doc in inverted_index[word]['docs']:
-                    docs_to_weights[doc] = inverted_index[word]['docs'][doc]['weight']
+                    docs_to_weights[doc] = (
+                        inverted_index[word]['docs'][doc]['weight']
+                    )
             if doc not in dict_of_doc_vectors:
                 dict_of_doc_vectors[doc] = []
                 for word in query:
@@ -169,7 +205,17 @@ def get_docs_with_all_words_in_query(query):
                         )
                     else:
                         dict_of_doc_vectors[doc].append(0)
-        # for word in query:
+    return dict_of_doc_vectors
+
+    # list_of_docs.append(
+    #     (
+    #         doc,
+    #         inverted_index[word][doc]['term_freq'],
+    #         inverted_index[word][doc]['weight']
+    #     )
+    # )
+
+    # for word in query:
     #     dict_of_doc_vectors[]
     # for word in query:
     #     for doc in inverted_index[word]['docs']:
@@ -177,13 +223,13 @@ def get_docs_with_all_words_in_query(query):
     # for word in dict_of_doc_vectors:
     #     for doc in dict_of_doc_vectors[word]:
     #         if doc not in docs_to_weights:
-    #             docs_to_weights[doc] = inverted_index[word]['docs'][doc]['weight']
+    #             docs_to_weights[doc] = (
+    #                 inverted_index[word]['docs'][doc]['weight']
+    #             )
     #         for word in query:
     #             if doc in inverted_index[word]['docs']:
-    #                 dict_of_doc_vectors[word][doc].append(inverted_index[word]['docs'][doc]['term_freq']*inverted_index[word]['idf'])
+    #                 dict_of_doc_vectors[word][doc].append(
+    #                     inverted_index[word]['docs'][doc]['term_freq']*inverted_index[word]['idf']
+    #                 )
     #             else:
     #                 dict_of_doc_vectors[word][doc].append(0)
-
-    return dict_of_doc_vectors
-
-# list_of_docs.append((doc, inverted_index[word][doc]['term_freq'], inverted_index[word][doc]['weight']))
