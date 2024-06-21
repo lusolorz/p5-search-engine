@@ -2,6 +2,13 @@
 
 case "$1" in
   start)
+    set +o pipefail
+    NPROCS=$(pgrep -f "flask --app index run --host 0.0.0.0 --port 900[0-2]" | wc -l)
+    set -o pipefail
+    if [ "$NPROCS" -ne 0 ]; then
+      echo "index server running"
+      exit 1
+    fi
     echo "starting index server ..."
     mkdir -p var/log
     rm -f var/log/index.log
@@ -21,7 +28,7 @@ case "$1" in
     set -o pipefail
     if [ "$NPROCS" -eq 3 ]; then
       echo "index server running"
-      exit
+      exit 0
     elif [ "$NPROCS" -eq 0 ]; then
       echo "index server stopped"
       exit 1
