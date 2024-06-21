@@ -7,6 +7,7 @@ from search.config import SEARCH_INDEX_SEGMENT_API_URLS
 # from search.model import get_document_details
 import search
 
+
 @search.app.route('/')
 def search_for_docs():
     """Search for documents."""
@@ -19,6 +20,7 @@ def search_for_docs():
         results = []
 
     return render_template('index.html', results=results)
+
 
 def get_request(query, weight, url, all_results):
     """GET request."""
@@ -78,10 +80,13 @@ def get_request(query, weight, url, all_results):
 #         threads[thread].join()
 
 #     # Use heapq.merge to merge all results, sorted by score
-#     # heapq.merge expects multiple sorted inputs, so we ensure each results list is sorted
+#     # heapq.merge expects multiple sorted inputs, so
+#     # ... we ensure each results list is sorted
 #     merged_results = heapq.merge(
 #         *[
-#             sorted(results, key=lambda x: x[1], reverse=True) for results in all_results
+#             sorted(
+#                 results, key=lambda x: x[1], reverse=True
+#             ) for results in all_results
 #         ], key=lambda x: x[1], reverse=True)
 
 #     # Convert the merged_results iterator to a list if needed
@@ -111,8 +116,14 @@ def get_search_results(og_query, weight):
         thread.join()
 
     # Use heapq.merge to merge all results, sorted by score
-    sorted_results = [sorted(results, key=lambda x: x[1], reverse=True) for results in all_results]
-    merged_results = heapq.merge(*sorted_results, key=lambda x: x[1], reverse=True)
+    sorted_results = [
+        sorted(
+            results, key=lambda x: x[1], reverse=True
+        ) for results in all_results
+    ]
+    merged_results = heapq.merge(
+        *sorted_results, key=lambda x: x[1], reverse=True
+    )
 
     # Convert the merged_results iterator to a list if needed
     merged_results = list(merged_results)

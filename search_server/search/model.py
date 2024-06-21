@@ -49,7 +49,7 @@ def get_document_details(docid):
     """Get document details from the database."""
     db = get_db()
     cursor = db.execute(
-        "SELECT title, summary, url FROM documents WHERE docid = ?", 
+        "SELECT title, summary, url FROM documents WHERE docid = ?",
         (docid,)
     )
     row = cursor.fetchone()
