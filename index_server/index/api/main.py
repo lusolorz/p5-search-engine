@@ -15,7 +15,7 @@ docs_to_weights = {}
 
 def load_index():
     """Load the inverted index, PageRank, and stopwords."""
-    global inverted_index, pagerank, stopwords
+    # global inverted_index, pagerank, stopwords
 
     # Load the inverted index
     inverted_index_path = os.path.join(
@@ -50,7 +50,7 @@ def load_index():
     # Load the stopwords
     stopwords_path = os.path.join("./index_server/index/stopwords.txt")
     with open(stopwords_path, 'r', encoding='utf-8') as f:
-        stopwords = set(word.strip() for word in f)
+        stopwords.update(word.strip() for word in f)
 
 
 # GET /api/v1/
